@@ -1,14 +1,16 @@
 ---
-title: "KobeQuestions"
+title: "Modeling Kobe"
 author: "Daniel Byrne"
 date: "April 12, 2019"
 output:
+  word_document: default
   html_document:
     df_print: paged
 ---
 
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(mosaic)
 library(aod)
 library(kableExtra)
@@ -36,292 +38,64 @@ kobe$playoffs = factor(kobe$playoffs)
 
 ```
 
-## Data Sets
+## Introduction
 
-### All Shots
+Kobe Bryant marked his retirement from basketball by scoring 60 points in his final game as a member of the Los Angeles Laker team on Wednesday, April 12, 2016. Starting to play professional basketball at the age of 17, Kobe earned the sport's highest accolades throughout his long career.  Using 20 years of data on Kobe's shots made and shots missed, we explore potential models that attempt to predict whether or not his shot went in.  This type of model could be used in building a simulation or video game in which a model can be used to predict whether or not a shot went in. 
 
-```{r}
-summary(kobe)
-```
+## Data
 
-
-### 2 pt shot data shots
-
-```{r}
-## Filter to only 2 pt shots
-kobe2pts = kobe %>% filter(shot_type == "2PT Field Goal" & shot_zone_area != "Back Court(BC)" & !shot_zone_basic %in% c("Right Corner 3","Left Corner 3","Above the Break 3"))
-summary(kobe2pts)
-```
-
-
-### 3 points shots
-
-```{r}
-
-kobe3pts = kobe %>% filter(shot_type == "3PT Field Goal" & shot_zone_range  %in% c("24+ ft.","16-24 ft.") & shot_distance > 23)
-summary(kobe3pts)
-```
+The original data set contains the location and circumstances of every shot attempted by Bryant during his 20-year career. Your task is to predict whether the basket went in (shot_made_flag = 1) or missed (shot_made_flag = 0).  The data for estimation is in project2Data.xlsx.
 
 ## Questions
 
-*The odds of Kobe making a shot decrease with respect to the distance he is from the hoop.  If there is evidence of this, quantify this relationship.  (CIs, plots, etc.)*
+We explored several models trying to establish the odds Kobe's shot would fall in.  We summarized that the odds of the shot being good would decreae relatively lineraly as a function of the distance from the basket. 
 
-### 2 pt distance models
-
-#### shot_zone_basic + loc_y
+The dataset contained several datpoints related to distance which we explored individually and in concert with other variables.  Two predictors, y_loc and shot_distance were highly colinear, and often were interchangeable in a model.  Most often however they interfered with each other when used together in the same model.
 
 ```{r}
-predictors = kobe2pts %>% dplyr::select(loc_y, shot_distance)
+predictors = kobe %>% dplyr::select(loc_y,shot_distance)
 cor(predictors)
 ```
 
-```{r}
-twosDist = glm(shot_made_flag ~   shot_zone_basic + loc_y, data = kobe2pts, family = "binomial" )
-summary(twosDist)
-```
+An analysis of the correlation matrix between the two predictors yielded a colineraity of about .8.
 
-#### shot_zone_area + loc_x
+Alogistic regressionmodel consisting of the predictors shot_distance, combined_shot_type, and shot_type appeared to yield the most signifigant results. 
 
 ```{r}
-twosx = glm(shot_made_flag~ shot_zone_area + loc_x, data=kobe2pts,family="binomial")
-summary(twosx)
-```
-
-#### loc_x + loc_y
-
-```{r}
-predictors = kobe2pts %>% dplyr::select(loc_x, loc_y)
-cor(predictors)
-```
-
-```{r}
-twosxy = glm(shot_made_flag~ loc_x + loc_y, data=kobe2pts,family="binomial")
-summary(twosxy)
-
-```
-
-#### shot distance
-
-```{r}
-shotdistance = glm(shot_made_flag~ shot_distance, data=kobe2pts,family="binomial")
+shotdistance = glm(shot_made_flag ~ shot_distance + combined_shot_type + shot_type, data=kobe,family="binomial")
 summary(shotdistance)
-```
 
-### 3pt models
-
-#### shot_zone_basic + loc_y
-
-```{r}
-threesDist = glm(shot_made_flag ~   shot_zone_basic + loc_y, data = kobe3pts, family = "binomial" )
-summary(threesDist)
-```
-
-#### shot_distance + loc_y
-
-```{r}
-predictors = kobe3pts %>% dplyr::select(loc_y, shot_distance)
-cor(predictors)
-```
-
-```{r}
-threesDist = glm(shot_made_flag ~   shot_distance + loc_y, data = kobe3pts, family = "binomial" )
-summary(threesDist)
-```
-
-#### shot_distance
-```{r}
-threesDist = glm(shot_made_flag ~ shot_distance, data = kobe3pts, family = "binomial" )
-summary(threesDist)
-```
-
-#### shot_zone_area + loc_x
-
-```{r}
-threesDist = glm(shot_made_flag~ shot_zone_area + loc_x, data=kobe3pts,family="binomial")
-summary(threesDist)
-```
-
-#### loc_x + loc_y
-
-```{r}
-predictors = kobe3pts %>% dplyr::select(loc_x, loc_y)
-cor(predictors)
-```
-
-```{r}
-xy = glm(shot_made_flag~ loc_x + loc_y, data=kobe3pts,family="binomial")
-summary(xy)
-
-```
-
-#### shot distance
-
-```{r}
-shotdistance = glm(shot_made_flag~ shot_distance, data=kobe3pts,family="binomial")
-summary(shotdistance)
-```
-
-
-### All shots models
-
-#### shot_zone_basic + loc_y
-
-```{r}
-dist = glm(shot_made_flag ~   shot_zone_basic + loc_y, data = kobe, family = "binomial" )
-summary(dist)
-```
-Decent model. Some levels of shot_zone_basic are not signifigant.  Loc_y is not signifigant, and probably correlated.
-
-
-#### shot_zone_basic
-
-```{r}
-dist = glm(shot_made_flag ~   shot_zone_basic, data = kobe, family = "binomial" )
-summary(dist)
-```
-Decent model. Some levels of shot_zone_basic are not signifigant.  Loc_y is not signifigant, and probalby correlated.
-
-
-#### shot_distance + loc_y
-
-```{r}
-predictors = kobe %>% dplyr::select(loc_y, shot_distance)
-cor(predictors)
-```
-
-Medium to high correlation
-
-```{r}
-dist = glm(shot_made_flag ~   shot_distance + loc_y, data = kobe, family = "binomial" )
-summary(dist)
-```
-
-Good for all shots even though correlated.
-
-#### shot_distance
-
-```{r}
-dist = glm(shot_made_flag ~ shot_distance, data = kobe, family = "binomial" )
-summary(dist)
-```
-
-Good model
-
-#### shot_zone_area + loc_x
-
-```{r}
-dist = glm(shot_made_flag~ shot_zone_area + loc_x, data=kobe,family="binomial")
-summary(dist)
-```
-Not Good
-
-#### loc_x + loc_y
-
-```{r}
-predictors = kobe %>% dplyr::select(loc_x, loc_y)
-cor(predictors)
-```
-
-Not correleated
-
-```{r}
-xy = glm(shot_made_flag~ loc_x + loc_y, data=kobe,family="binomial")
-summary(xy)
-```
-
-Loc_x is not signifigant, but loc_y is.
-
-#### shot distance
-
-```{r}
-shotdistance = glm(shot_made_flag~ shot_distance, data=kobe,family="binomial")
-summary(shotdistance)
-```
-Good model
-
-#### shot_zone_area + loc_x
-
-```{r}
-twosx = glm(shot_made_flag~ shot_zone_area + loc_x, data=kobe,family="binomial")
-summary(twosx)
-```
-
-Decent model.  Loc_x is barely not signifigant.
-
-#### loc_x + loc_y
-
-```{r}
-predictors =  kobe %>% dplyr::select(loc_x, loc_y)
-cor(predictors)
-```
-Not correlated
-
-```{r}
-sxy = glm(shot_made_flag~ loc_x + loc_y, data=kobe,family="binomial")
-summary(xy)
-```
-loc_x is not signifigant.
-
-#### loc_y
-
-```{r}
-y = glm(shot_made_flag~ loc_y, data=kobe,family="binomial")
-summary(y)
-```
-signifigant.
-
-#### shot distance
-
-```{r}
-shotdistance = glm(shot_made_flag~ shot_distance, data=kobe,family="binomial")
-summary(shotdistance)
-```
-
-Good Model
-
-
-#### shot distance and combined shot type
-
-```{r}
-shotdistance = glm(shot_made_flag~ shot_distance+ combined_shot_type, data=kobe,family="binomial")
-summary(shotdistance)
-```
-
-Good Model
-
-#### loc_y and combined_shot_type
-
-```{r}
-shotdistance = glm(shot_made_flag~ loc_y + combined_shot_type, data=kobe,family="binomial")
-summary(shotdistance)
-```
-
-Good Model
-
-#### shot_distance, combined_shot_type, and shot_type
-
-```{r}
-shotdistance = glm(shot_made_flag~ shot_distance + combined_shot_type + shot_type, data=kobe,family="binomial")
-summary(shotdistance)
-```
-
-Good Model
-
-```{r}
 ## CIs using standard errors
 confint.default(shotdistance)
 ```
 
-Overall effect of combined_shot_type
+
+From the results in the table above, shot_distance, combined_shot_type, and shot_type all appear to be statistically signifigant.
+
+
+
 ```{r}
-wald.test(b = coef(shotdistance), Sigma = vcov(shotdistance), Terms = 3:8)
+cstwald = wald.test(b = coef(shotdistance), Sigma = vcov(shotdistance), Terms = 3:7)
+cstwald
 ```
 
-The chi-squared test statistic of 502.2, with three degrees of freedom is associated with a p-value << 0 indicating that the overall effect of rank is statistically significant.
+The chi-squared test statistic of `cstwald$result$chi2["chi2"]`, with `cstwald$result$chi2["df"]` degrees of freedom is associated with a p-value << 0 indicates that the overall effect of combined_shot_type is statistically significant.
 
 
 ```{r}
+wald.test(b = coef(shotdistance), Sigma = vcov(shotdistance), Terms = 8)
+``` 
+
+Furthermore the chi-squared test statistic of 12.6, with 1 degree of freedom and a p-value .0038 indicates that the overall effect of shot_type is statistically significant as well.
+
+
+```{r, warning=FALSE}
 # calculate odds ratios
 oddsratios = exp(cbind(OR = coef(shotdistance), confint(shotdistance)))
-kable(oddsratios)
+kable(oddsratios, format = "pandoc")
 ```
+
+For a one unit increase in shot_distance, the odds of Kobe making his shot decreases by 2%.
+
+
+
