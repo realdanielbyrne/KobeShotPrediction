@@ -97,7 +97,16 @@ kable(oddsratios, format = "pandoc")
 For a one unit increase in shot_distance, the odds of Kobe making his shot decreases by ~2%.
 
 
+```{r}
+predictors = kobe %>% dplyr::select(loc_y,shot_distance,lon,lat)
+cor(predictors)
+ ce
+ ```
+
 ### The probability of Kobe making a shot decreases linearly with respect to the distance he is from the hoop.
+
+```{r}
+```
 
 
 ### The relationship between the distance Kobe is from the basket and the odds of him making the shot is different if they are in the playoffs.
