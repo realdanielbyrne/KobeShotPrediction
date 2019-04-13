@@ -1,11 +1,12 @@
 libname xl XLSX 
   '/home/gkodi0/project2Data.xlsx';
 
-data data; set xl.KobeDataProj2; run;
+data data; set xl.KobeDataProj2;  RandNumber = ranuni(11);  run;
 
 data dataKB;                                                                                                                                                                                                              
  set data;  
- if action_type eq "Alley Oop Dunk Shot" then action_type_cat=1;
+ time_remaining = 60*minutes_remaining+seconds_remaining;
+if action_type eq "Alley Oop Dunk Shot" then action_type_cat=1;
 if action_type eq "Alley Oop Layup shot" then action_type_cat=2;
 if action_type eq "Cutting Layup Shot" then action_type_cat=3;
 if action_type eq "Driving Bank shot" then action_type_cat=4;
@@ -120,14 +121,17 @@ if opponent eq "NOP" then opponent_cat=31;
 if opponent eq "OKC" then opponent_cat=32;
 if opponent eq "BKN" then opponent_cat=33;                                                                                                                                                                 
 run;                                                                                                                                                                                                                     
-      
-      
-proc corr data=dataKB;
-var  action_type_cat comb_type_cat shot_type_cat shot_zone_cat shot_zone_bas_cat shot_zone_range_cat opponent_cat lat lon minutes_remaining period playoffs seconds_remaining shot_distance attendance arena_temp avgnoisedb;
-run;
+
+data trainKB; set dataKB; if RandNumber <= 1/4 then delete;                                                                                                                                                                                         
+run;                                                                                                                                                                                                                     
+                                                                                                                                                                                                                         
+data testKB; set dataKB; if RandNumber > 1/4 then delete;                                                                                                                                                                                         
+run; 
+
+/** priors '0' 0.5538 '1' 0.4462 */
 
 proc reg data=dataKB ;
-model shot_made_flag = action_type_cat comb_type_cat shot_type_cat shot_zone_cat shot_zone_bas_cat shot_zone_range_cat opponent_cat lat lon minutes_remaining period playoffs seconds_remaining shot_distance attendance arena_temp avgnoisedb / r;
+model shot_made_flag = action_type_cat comb_type_cat shot_type_cat shot_zone_cat shot_zone_bas_cat shot_zone_range_cat opponent_cat lat lon time_remaining period playoffs shot_distance attendance arena_temp avgnoisedb / r;
 output out=kbCook cookd=cooks student=students rstudent=studresid;
 run;
 
@@ -139,8 +143,35 @@ proc print data=outSortKB (obs=10);
  var recId cooks;
 run;
 
+      
+      
+proc corr data=dataKB;
+var  action_type_cat comb_type_cat shot_zone_cat opponent_cat lon period playoffs time_remaining shot_distance attendance arena_temp ;
+run;
+
+/**
 proc reg data=dataKB plots=all;
 model shot_made_flag = action_type_cat comb_type_cat shot_type_cat shot_zone_cat shot_zone_bas_cat shot_zone_range_cat opponent_cat lat lon minutes_remaining period playoffs seconds_remaining shot_distance attendance arena_temp avgnoisedb / vif  tol collin;
+run;
+**/
+
+
+proc reg data=dataKB plots=all;
+model shot_made_flag = action_type_cat comb_type_cat shot_zone_cat opponent_cat lat lon time_remaining period playoffs shot_distance attendance arena_temp / vif  tol collin;
+run;
+
+proc logistic data=dataKB order=data plots=all;
+model shot_made_flag = action_type_cat comb_type_cat shot_type_cat shot_zone_cat shot_zone_bas_cat shot_zone_range_cat opponent_cat lat lon time_remaining period playoffs shot_distance attendance arena_temp avgnoisedb;
+run;
+
+proc discrim data=trainKB pool=yes crossvalidate testdata=testKB ;
+class action_type;
+var lon time_remaining period playoffs shot_distance attendance arena_temp;
+run;
+
+proc logistic data=dataKB order=data plots=all;
+class action_type combined_shot_type shot_type opponent shot_zone_area / param=ref;
+model shot_made_flag = lon time_remaining period playoffs shot_distance attendance arena_temp ;
 run;
 
 proc princomp prefix=k data=dataKB out=pcKB;

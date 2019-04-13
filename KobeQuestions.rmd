@@ -48,6 +48,8 @@ The original data set contains the location and circumstances of every shot atte
 
 ## Questions
 
+### The odds of Kobe making a shot decrease with respect to the distance he is from the hoop*
+
 We explored several models trying to establish the odds Kobe's shot would fall in.  We summarized that the odds of the shot being good would decreae relatively lineraly as a function of the distance from the basket. 
 
 The dataset contained several datpoints related to distance which we explored individually and in concert with other variables.  Two predictors, y_loc and shot_distance were highly colinear, and often were interchangeable in a model.  Most often however they interfered with each other when used together in the same model.
@@ -69,10 +71,7 @@ summary(shotdistance)
 confint.default(shotdistance)
 ```
 
-
 From the results in the table above, shot_distance, combined_shot_type, and shot_type all appear to be statistically signifigant.
-
-
 
 ```{r}
 cstwald = wald.test(b = coef(shotdistance), Sigma = vcov(shotdistance), Terms = 3:7)
@@ -95,7 +94,10 @@ oddsratios = exp(cbind(OR = coef(shotdistance), confint(shotdistance)))
 kable(oddsratios, format = "pandoc")
 ```
 
-For a one unit increase in shot_distance, the odds of Kobe making his shot decreases by 2%.
+For a one unit increase in shot_distance, the odds of Kobe making his shot decreases by ~2%.
 
 
+### The probability of Kobe making a shot decreases linearly with respect to the distance he is from the hoop.
 
+
+### The relationship between the distance Kobe is from the basket and the odds of him making the shot is different if they are in the playoffs.

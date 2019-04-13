@@ -40,36 +40,36 @@ proc logistic data=kobeshots descending;
   class combined_shot_type shot_type / param=ref ;
   model shot_made_flag(event='1') = shot_distance combined_shot_type shot_type;
   oddsratio shot_distance;
-  output out=logisticOut predprobs=I p=predprob resdev=resdev reschi=pearres;
+  output out=logisticOut predprobs=X p=predprob resdev=resdev reschi=pearres;
 run;
  ods graphics off;
 
 
 ods graphics on;
-proc logistic data=kobeshots descending;
+proc logistic data=kobetrain descending;
   class shot_type / param=ref ;
-  model shot_made_flag(event='1') = shot_distance shot_type;
+  model shot_made_flag(event='1') = shot_distance shot_type/ lackfit cl pcorr ctable pprob= (0.4 to 0.6 by 0.1);;
   oddsratio shot_distance;
-  output out=logisticOut predprobs=I p=predprob resdev=resdev reschi=pearres;
+  output out=logisticOut predprobs=X p=predprob resdev=resdev reschi=pearres;
 run;
  ods graphics off;
  
 ods graphics on;
-proc logistic data=kobeshots descending;
+proc logistic data=kobetrain descending;
   class shot_zone_range / param=ref ;
-  model shot_made_flag(event='1') = shot_distance shot_zone_range;
+  model shot_made_flag(event='1') = shot_distance shot_zone_range/ lackfit cl pcorr ctable pprob= (0.4 to 0.6 by 0.1);;
   oddsratio shot_distance;
-  output out=logisticOut predprobs=I p=predprob resdev=resdev reschi=pearres;
+  output out=logisticOut predprobs=X p=predprob resdev=resdev reschi=pearres;
 run;
 ods graphics off;
  
-ods graphics on;
-proc logistic data=kobeshots descending;
+
+proc logistic data=kobetrain descending outmodel = kobetrained;
   class combined_shot_type shot_type shot_zone_range/ param=ref ;
-  model shot_made_flag(event='1') = shot_distance combined_shot_type shot_zone_range;
-  oddsratio shot_distance;
-  output out=logisticOut predprobs=I p=predprob resdev=resdev reschi=pearres;
+  model shot_made_flag(event='1') = shot_distance combined_shot_type shot_zone_range/ lackfit cl pcorr ctable pprob= (0.4 to 0.6 by 0.1);
+  output out=logisticOut predprobs=X p=predprob resdev=resdev reschi=pearres;
 run;
-ods graphics off;
+
+proc print data = logisticout(obs=10);run;
 
 
