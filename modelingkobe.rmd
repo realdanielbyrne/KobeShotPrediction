@@ -51,7 +51,6 @@ the likelihood of his making or missing a shot.  We show that our final model is
 in predicting a shot.  We speculate that additional data points commonly captured in sport statistics
 such as whether or not the shot was contested could add specificity to the model.  Also 
 
-
 ## Introduction
 
-Kobe Bryant marked his retirement from basketball by scoring 60 points in his final game as a member of the Los Angeles Laker team on Wednesday, April 12, 2016. Starting to play professional basketball at the age of 17, Kobe earned the sport's highest accolades throughout his long career.  Using 20 years of data on Kobe's shots made and shots missed, we explore potential models that attempt to predict whether or not his shot went in.  This type of model could be used in building a simulation or video game in which a model can be used to predict whether or not a shot went in. 
+Kobe Bryant marked his retirement from basketball by scoring 60 points in his final game as a member of the Los Angeles Lakers team on Wednesday, April 12, 2016. Starting to play professional basketball at the age of 17, Kobe earned the sport's highest accolades throughout his long career.  Using 20 years of data on Kobe's shots made and shots missed, we explore potential models that attempt to predict whether or not his shot went in.  This type of model could be used in building a simulation or video game in which a model can be used to predict whether or not a shot went in. 
