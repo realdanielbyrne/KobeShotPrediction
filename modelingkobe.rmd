@@ -43,14 +43,18 @@ Sports data modeling has been a staple of video game development for many years.
 The major leagues leagues NBA, NFL, NHL have all partnered with various software development
 companies to produce ever more realistic video games depicting the leagues's top stars
 acting and more importantly scoring as they do in real life.  With the $20 billion
-video game industry fueled by the now growing e-sports segment. Ever more realistic models
+video game industry fueled by the now growing e-sports segment, ever more realistic models
 are needed for developers to build the characters in their games.  We explore
 a common dataset of Kobe Bryant's depicting the shots he made and missed over his
 20 year career and try to build a model that would predict with a high degree of probability
 the likelihood of his making or missing a shot.  We show that our final model is moderately successful
 in predicting a shot.  We speculate that additional data points commonly captured in sport statistics
-such as whether or not the shot was contested could add specificity to the model.  Also 
+such as whether or not the shot was contested could add specificity to the model.
 
 ## Introduction
 
-Kobe Bryant marked his retirement from basketball by scoring 60 points in his final game as a member of the Los Angeles Lakers team on Wednesday, April 12, 2016. Starting to play professional basketball at the age of 17, Kobe earned the sport's highest accolades throughout his long career.  Using 20 years of data on Kobe's shots made and shots missed, we explore potential models that attempt to predict whether or not his shot went in.  This type of model could be used in building a simulation or video game in which a model can be used to predict whether or not a shot went in. 
+Kobe Bryan is a retired professional basketball player who spent 20 years with the Los Angles Lakers.  Kobe entered the NBA directly out of Lower Menton High School in Pennsylvania.  He won 5 NBA Championships, was selected to the All-Star team 18 times, and won 2 Olympic gold medals.  He is also widely considered one of the greatest basketball players of all time.   
+
+Using 20 years of data on Kobe's shots made and shots missed, we explore potential models that attempt to predict whether or not his shot went in.  The data set `project2Data.xlsx` contains the location on the floor some surrounding circumstances of every shot he attempted in the NBA. Free Throw data is not included in the dataset.  We attempt to build a model from this data that can predict with a reasonable degree of certainty whether the shot went in (shot_made_flag = 1) or missed (shot_made_flag = 0).  We tested our final model against the held out `project2Pred.xlsx` dataset which was not used in training or testing the iterative models.
+
+This type of model could be used in building a simulation or video game mimicking Kobe's game. Sports data modeling has been a staple of video game development for many years. The major leagues leagues NBA, NFL, NHL have all partnered with various software development companies to produce ever more realistic video games depicting the leagues's top stars acting and more importantly scoring as they do in real life.  With the $20 billion video game industry fueled by the now growing e-sports segment, ever more realistic models are needed for developers to build the characters in their games.
