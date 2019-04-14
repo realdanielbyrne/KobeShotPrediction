@@ -29,7 +29,7 @@ if shot_zone_range = "Less Than 8ft." then szRange = 1;
 if shot_type = "2PT Field Goal" the shot_type_cat = 0;
 if shot_type = "3PT Field Goal" the shot_type_cat = 1;
 
-run;89
+run;
 
 
 data kobeshots; 
