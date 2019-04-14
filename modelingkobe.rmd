@@ -53,8 +53,44 @@ such as whether or not the shot was contested could add specificity to the model
 
 ## Introduction
 
-Kobe Bryan is a retired professional basketball player who spent 20 years with the Los Angles Lakers.  Kobe entered the NBA directly out of Lower Menton High School in Pennsylvania.  He won 5 NBA Championships, was selected to the All-Star team 18 times, and won 2 Olympic gold medals.  He is also widely considered one of the greatest basketball players of all time.   
+Kobe Bryan is a retired professional basketball player who spent 20 years with the Los Angles Lakers.  Kobe entered the NBA directly out of Lower Menton High School in Pennsylvania.  He won 5 NBA Championships, was selected to the All-Star team 18 times, and won 2 Olympic gold medals.  He is also widely considered one of the greatest basketball players of all time. 
 
 Using 20 years of data on Kobe's shots made and shots missed, we explore potential models that attempt to predict whether or not his shot went in.  The data set `project2Data.xlsx` contains the location on the floor some surrounding circumstances of every shot he attempted in the NBA. Free Throw data is not included in the dataset.  We attempt to build a model from this data that can predict with a reasonable degree of certainty whether the shot went in (shot_made_flag = 1) or missed (shot_made_flag = 0).  We tested our final model against the held out `project2Pred.xlsx` dataset which was not used in training or testing the iterative models.
 
 This type of model could be used in building a simulation or video game mimicking Kobe's game. Sports data modeling has been a staple of video game development for many years. The major leagues leagues NBA, NFL, NHL have all partnered with various software development companies to produce ever more realistic video games depicting the leagues's top stars acting and more importantly scoring as they do in real life.  With the $20 billion video game industry fueled by the now growing e-sports segment, ever more realistic models are needed for developers to build the characters in their games.
+
+## Data Description
+
+The field names are self explanatory and contain the following attributes:
+
+| Data Label         | Description                                         |
+|--------------------|-----------------------------------------------------|
+| action_type        | Type of shot action                                 |
+| combined_shot_type | Type of shot combined with action                   |
+| game_event_id      | Game id used to identify shots within the same game |
+| game_id            | Game id used to identify shots within the same game |
+| lat                | Horizontal position on floor                        |
+| loc_x              | Horizontal position on floor                        |
+| loc_y              | Vertical position on floor                          |
+| lon                | Vertical position on floor                          |
+| minutes_remaining  | Minutes remaining in quarter                        |
+| period             | Quarter of play                                     |
+| playoffs           | Playoff game or not                                 |
+| season             | Season label                                        |
+| seconds_remaining  | Seconds remaining in quarter                        |
+| shot_distance      | Distance from goal                                  |
+| shot_made_flag     | 1- shot went I, 0 - shot missed                     |
+| shot_type          | 2pt or 3pt shot                                     |
+| shot_zone_area     | General location of shot                            |
+| shot_zone_basic    | General location of shot                            |
+| shot_zone_range    | General range from basket                           |
+| team_id            | ID for LA Lakers                                    |
+| team_name          | Always LA Lakers                                    |
+| game_date          | The date the game was played on                     |
+| matchup            | The team and who was home vs away                   |
+| opponent           | The opposing team                                   |
+| shot_id            | Unique shot ID                                      |
+| attendance         | The attendance in the stadium                       |
+| arena_temp         | The average temperature during the game             |
+| avgnoisedb         | The average noise level in dB during the game       |
+
