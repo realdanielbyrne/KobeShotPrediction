@@ -82,12 +82,11 @@ We evaluated a large but not exhaustive number of predictive variable combinatio
 
 ```{r}
 par(mfrow=c(2,2))
+plot(kobe$shot_made_flag,col="lightblue",xlab="Shots Missed(0) Made(1)")
+plot(kobe$playoffs,col="lightblue",xlab="RegularSeason(0)   Playoffs(1)")
 
-plot(kobe$shot_made_flag,col=rainbow(2),xlab="Missed(0) Made(1)")
-plot(kobe$playoffs,col=rainbow(2),xlab="Shots in Regular Season(0) and Playoffs(1)")
-
-plot(kobe$shot_type,col=rainbow(2), xlab="Shot Type")
-plot(kobe$combined_shot_type,col=rainbow(5), xlab="Combined Shot Type") 
+plot(kobe$shot_type,col="lightblue", xlab="Shot Type")
+plot(kobe$combined_shot_type,col="lightblue", xlab="Combined Shot Type") 
 ```
 
 
@@ -120,7 +119,7 @@ There are also some potential similarities between the categorical variables in 
 
 Based on Cooks's D data and plain data analysis, we are seeing no outlier present in the selected variables. Here is the first 5 observations with highest cook's D value.  Since these values are less than 3, we assume that there are no outliers. 
 
-![](./outliers.png)
+![](./images/outliers.png)
 
 ## Analysis Questions
 
@@ -130,14 +129,18 @@ We set out to test the following hyphothesis:
 2. The probability of Kobe making a shot decreases linearly with distance.    
 3. The relationship between the distance Kobe is from the basket and the odds of him making the shot is different if they are in the playoffs.
 
+### Odds of Making Decreases with Distance
+
 To test these hyphothesis we evaluated several models.  For the first we evaluated a logisic regression model consisting of `shot_distance, shot_type, combined_shot_type` and a linear combination of the continuous variables time_remaining, attendance, arena_temp, and avgnoisedb` using principal componenet analysis. Our PCA analysis revealed that the first orthoganol combination contributed nealy 95% of the variance of these variables and the remaining transformations did not contribute signifigantly.
 
 
 ```{r}
 pcamodel = kobe %>% select(time_remaining,attendance,arena_temp,avgnoisedb)
 pca <- prcomp(pcamodel) 
-plot(pca, type = "l")
 ```
+
+![](./images/pca.png)
+
 
 In final SAS model then we only included k1, the first orthagonal combination of PCA analysis.
 
@@ -149,14 +152,29 @@ Regression analysis revealed that shot_distance, combined_shot_type, shot_type, 
 
 ![](./images/logisticanalysis.png)
 
-Furthermore the wald ChiSquare test statistics (5 df, p-value << 0) for combined_shot_type and  (chi^2 =8.23 , p-value << .0041) for shot_type indicates that the overall effect of the categorical variables are independant and also statistically significant.
+Furthermore, the Wald ChiSquare test statistics (5 df, p-value << 0.001) for combined_shot_type and  (chisq =8.23 , p-value < .0041) for shot_type indicates that the overall effect of the categorical variables are independant and also statistically significant.  The Hosmer Lemeshow Fit test (ChiSq 40.318, 8df, Pr>ChiSq <.0001) also indicates a good fitting model.
 
 
 ![](./images/ROC.png)
 
 The ROC curve revealed an AUC of .63, which is less than ideal, but better than random guessing.  .7 Is the usual target for this statistic.  The logistic model shows that or a 1 unit increase in shot_distance, the odds of Kobe making his shot decreases by about 2% (+/- .06% ).
 
+### The probability of making a shot decreases linearly
+
+As part of our analysis we tested the hypothesis that the odds of Kobe making a shot decreases linearly as he is further away from the basket.  
+To assess this we setup a contrast in our model to assess the effect of shot_distance on a 2pt anmd 3pt jump_shot while keeping k1 at its mean. The curve is mostly linear, with a slight asymptotic approch to zero after 40' indicating that the probability drops off roughly linearly as shot distance increases up to 40', or 7' less than halfcourt.
 
 
+![](./images/linearprob.png)
 
+### The relationship between the distance Kobe is from the basket and the odds of him making the shot is different if they are in the playoffs
 
+To assess this question, we added playoffs to our logistical model and evaluated the relationship of shot distance to shots made or missed in the playoffs and in the regular season.  
+
+![](./images/linearprob.png)
+
+The graphic shows the same linear relationship we observed before adding playoffs to the model, but adding playofs to the model shows adds no statistically signifignt impact to the probability of making shots (p-value = 0.8470).
+
+![](./images/playoffstats.png)
+
+![](./images/linearplayoffs.png)
