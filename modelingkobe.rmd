@@ -1,6 +1,6 @@
 ---
 title: "Modeling Kobe"
-author: "Daniel Byrne"
+author: "Daniel Byrne, Ganesh Kodi"
 date: "April 12, 2019"
 output:
   word_document: default
@@ -42,27 +42,13 @@ kobe$time_remaining = 60*kobe$minutes_remaining+kobe$seconds_remaining
 
 ## Abstract
 
-Sports data modeling has been a staple of video game development for many years.
-The major leagues leagues NBA, NFL, NHL have all partnered with software development
-companies to produce realistic video games depicting the leagues's top stars
-acting and scoring as they do in real life.  
+Sports data modeling has been a staple of video game development for many years. The major leagues leagues NBA, NFL, NHL have all partnered with software development companies to produce realistic video games depicting the leagues's top stars acting and scoring as they do in real life.  
 
-With the $20 billion video game industry fueled by the now growing e-sports segment, ever more realistic models
-are needed for developers to build the characters in their games.  We explore
-a common dataset of Kobe Bryant's career shots, and try to build a model that would predict
+With the $20 billion video game industry fueled by the now growing e-sports segment, ever more realistic models are needed for developers to build the characters in their games and to stay competitive in the market.  We explore a common dataset of Kobe Bryant's career shots, and try to build a model that would predict
 the likelihood of his making or missing a shot. 
 
-We show that our final model is moderately successful, 65%, as
-in predicting a shot.  We further speculate that additional data points commonly captured in sport statistics
-such as whether or not the shot was contested could add specificity to the model.
+We show that our final model is moderately successful, 65%, as in predicting a shot.  We further speculate that additional data points commonly captured in sport statistics such as whether or not the shot was contested could add specificity to the model.
 
-## Introduction
-
-Kobe Bryan is a retired professional basketball player who spent 20 years with the Los Angles Lakers.  Kobe entered the NBA directly out of High School.  He won 5 NBA Championships, was selected to the All-Star team 18 times, and won 2 Olympic gold medals.
-
-Using 20 years of data on Kobe's shots made and shots missed, we explore potential models that attempt to predict whether or not his shot went in.  The data set `project2Data.xlsx` contains the location on the floor and supporting observations of every shot he attempted in the NBA.  We attempt to build a model from this data that can predict whether the shot went in or missed.  We tested our final model against the held out `project2Pred.xlsx` dataset which was not used in training or testing the iterative models.
-
-This type of model could be used in building a simulation or video game mimicking Kobe's game. Sports data modeling has been a staple of video game development for many years. The major leagues leagues NBA, NFL, NHL have all partnered with software companies to produce realistic video games depicting their league's top stars acting and scoring as they do in real life.  With the $20 billion video game industry fueled by the now growing e-sports segment, realistic models are needed for developers to build these characters in their games and to stay competitive.
 
 ## Data Description
 
@@ -127,9 +113,7 @@ predictors = kobe %>% dplyr::select(loc_y,shot_distance)
 cor(predictors)
 ```
 
-![](./images/distance.png)
-
-There are also some similarities betweeb categorical variables although categorical variables cannot be colinear. They do not represent linear measures in Euclidean space.  We use chi-square tests to determine independence of categorical variables.
+There are also some potential similarities between the categorical variables in the dataset although categorical variables cannot be colinear as they do not represent linear measures in Euclidean space.  As such we use chi-square tests on our coeficientsto determine independence and signifigance of the categorical variables.
 
 
 ## Outlier Analysis
@@ -142,44 +126,35 @@ Based on Cooks's D data and plain data analysis, we are seeing no outlier presen
 
 We set out to test the following hyphothesis:
 
-1. The odds of Kobe making a shot decrease with respect to the distance he is from the hoop.
-2. The probability of Kobe making a shot decreases linearly with respect to the distance he is from the hoop.    
+1. The odds of Kobe making a shot decreases with the distance from the hoop.
+2. The probability of Kobe making a shot decreases linearly with distance.    
 3. The relationship between the distance Kobe is from the basket and the odds of him making the shot is different if they are in the playoffs.
 
-To test these hyphothesis we evaluated several models.  For the first we evelated a logisic regression model consisting of `shot_distance, shot_type, combined_shot_type` and a linear combination of the continuous variables `time_remaining, attendance, arena_temp, avgnoisedb` using principal componenet analysis. Our PCA analysis revealed that the first orthoganol combination contributed nealy 95% of the variance of these variables where as the remaining transformations did not contribute signifigantly.
+To test these hyphothesis we evaluated several models.  For the first we evaluated a logisic regression model consisting of `shot_distance, shot_type, combined_shot_type` and a linear combination of the continuous variables time_remaining, attendance, arena_temp, and avgnoisedb` using principal componenet analysis. Our PCA analysis revealed that the first orthoganol combination contributed nealy 95% of the variance of these variables and the remaining transformations did not contribute signifigantly.
 
 
 ```{r}
 pcamodel = kobe %>% select(time_remaining,attendance,arena_temp,avgnoisedb)
 pca <- prcomp(pcamodel) 
 plot(pca, type = "l")
-print(pca)
 ```
 
 In final SAS model then we only included k1, the first orthagonal combination of PCA analysis.
 
 ```
-  class shot_type home combined_shot_type(ref='Jump Shot') /param=ref;
-  model shot_made_flag(event='1') = shot_distance shot_type k1 combined_shot_type
-```
-
-```{r}
-log1 = glm(shot_made_flag ~ shot_distance + combined_shot_type + shot_type , data=kobe,family="binomial")
+model shot_made_flag(event='1') = shot_distance shot_type k1 combined_shot_type
 ```
 
 Regression analysis revealed that shot_distance, combined_shot_type, shot_type, and k1 all appear to be statistically signifigant with p-values << 0.
 
 ![](./images/logisticanalysis.png)
 
-
 Furthermore the wald ChiSquare test statistics (5 df, p-value << 0) for combined_shot_type and  (chi^2 =8.23 , p-value << .0041) for shot_type indicates that the overall effect of the categorical variables are independant and also statistically significant.
 
 
 ![](./images/ROC.png)
 
-The ROC curve revealed an AUC of .63, which is less than ideal.  .7 Is the usual target for this statistic.  
-
-The logistic model shows that or a 1 unit increase in shot_distance, the odds of Kobe making his shot decreases by ~2%.
+The ROC curve revealed an AUC of .63, which is less than ideal, but better than random guessing.  .7 Is the usual target for this statistic.  The logistic model shows that or a 1 unit increase in shot_distance, the odds of Kobe making his shot decreases by about 2% (+/- .06% ).
 
 
 
