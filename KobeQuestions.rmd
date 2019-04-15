@@ -98,14 +98,15 @@ For a one unit increase in shot_distance, the odds of Kobe making his shot decre
 
 
 ```{r}
-predictors = kobe %>% dplyr::select(loc_y,shot_distance,lon,lat)
+predictors = kobe %>% dplyr::select(shot_distance)
 cor(predictors)
- ce
- ```
+chisq.test(predictors)
+```
 
 ### The probability of Kobe making a shot decreases linearly with respect to the distance he is from the hoop.
 
 ```{r}
+ chisq()
 ```
 
 

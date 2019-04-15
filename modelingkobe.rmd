@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(mosaic)
 library(aod)
 library(kableExtra)
+library(vcd)
 layout(matrix(c(1,2,3,4),2,2))
 ```
 
@@ -95,35 +96,72 @@ The field names are self explanatory and contain the following attributes:
 | arena_temp         | The average temperature during the game             |
 | avgnoisedb         | The average noise level in dB during the game       |
 
+## Data Analysis
+
 We evaluated a large but not exhaustive number of predictive variable combinations and potential models in our analysis.  The following variables played a part in our final model
 
-#### Categorical Variables Used in Model
 
+- Shot_distance : We analyzed the hyphothesis that Kobe's odds of making his shots decreased as the shot distance increased and whether or not this was a linear phenomenon.
+- Shot_type : we saw a statistically signifigant contribution from shot_type in a number of our test models we led us to include this variable into our final model.
+- Combined_shot_type : Likewise combined_shot_type showed a stitistically signifigant contribution in a number of models
+- Playoffs : We included this predictor in a model used to evaluate Kobe's performance in the regular season vs. the playoffs
 
 
 ```{r}
-layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
-plot(kobe$shot_made_flag)
+
+
+par(mfrow=c(2,2))
+
+plot(kobe$shot_made_flag,col=rainbow(2),xlab="Missed(0) Made(1)")
+plot(kobe$playoffs,col=rainbow(2),xlab="Shots in Regular Season(0) and Playoffs(1)")
+
 plot(kobe$shot_type,col=rainbow(2), xlab="Shot Type")
 plot(kobe$combined_shot_type,col=rainbow(5), xlab="Combined Shot Type") 
 ```
 
 
-
-#### Continuours Variables
-
 We combined the following continuous variables into their principle components to include in out final model.
 
+- Time_remaining : We created this datapoint from minutes_remaining*60+seconds_remaining
+- Average Attendance 
+- Average Temperature 
+- Average Noise Level (dB)
+
+![](./images/attendance_avgtemp_avgdb.png)
+
+
+## Multicollinearity Analysis
+
+High bivariate correlations were easy to spot bwhen we ran correlation calculations among our target predictors.  We noticed signifigant correlations between loc_y and shot_distance, loc_x and lon and loc_y and lat. Coincidently we did not find models with both `loc_y` and `shot_distance` or with `loc_x` and `lon` or `loc_y` and `lat` to be good models due to their colinearity.
+
 ```{r}
-#time_remaining attendance arena_temp avgnoisedb
-#par(mfrow=c(1,3))
-#boxplot(kobe$attendance, xlab="Attendance",col=kobe$attendance)
-#boxplot(kobe$arena_temp, xlab="Arena Temperature",col=kobe$arena_temp)
-#boxplot(kobe$time_remaining,xlab="Time Remaining(s)",col=kobe$time_remaining)
+predictors = kobe %>% dplyr::select(loc_x,loc_y,lat,lon)
+cor(predictors)
+
+predictors = kobe %>% dplyr::select(loc_y,shot_distance)
+cor(predictors)
 ```
-![](./images/time_plyoff_dist.png)
 
 ![](./images/distance.png)
 
-![](./images/attendance_avgtemp_avgdb.png)
+There are also some similarities betweeb categorical variables although categorical variables cannot be colinear. They do not represent linear measures in Euclidean space.  We use chi-square tests to determine independence of categorical variables.
+
+However it is helpful to visualize some of the similaities.  The graph below shows high colinearity between layups and dunks, and a high degree of similarity with bankshots and tipshots.  All of which are understandable.  However all of these shot types are also in the same categorical variable, and as such not directly colinear with any otehr variables. 
+
+```{r}
+tbl = kobe %>% select(shot_type, combined_shot_type)
+assoc(tbl,shade=TRUE,legend = TRUE)
+```
+
+
+
+## Outlier Analysis
+
+
+
+
+
+
+
+
 
