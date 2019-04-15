@@ -47,7 +47,7 @@ Sports data modeling has been a staple of video game development for many years.
 With the $20 billion video game industry fueled by the now growing e-sports segment, ever more realistic models are needed for developers to build the characters in their games and to stay competitive in the market.  We explore a common dataset of Kobe Bryant's career shots, and try to build a model that would predict
 the likelihood of his making or missing a shot. 
 
-We show that our final model is moderately successful, 65%, as in predicting a shot.  We further speculate that additional data points commonly captured in sport statistics such as whether or not the shot was contested could add specificity to the model.
+We show that our final models are poor, 35% to 47% accuarte in predicting a shot will be made from anywhere on the floor.  We further speculate that additional data points commonly captured in sport statistics such as whether or not the shot was contested could add specificity to the model.
 
 
 ## Data Description
@@ -178,3 +178,34 @@ The graphic shows the same linear relationship we observed before adding playoff
 ![](./images/playoffstats.png)
 
 ![](./images/linearplayoffs.png)
+
+### Alternative Linear Discrimitive Analysis Model
+
+As an alternative to the logistic regression model, we also examined a model built upon the Linear Discriminant Analysis technique, and compared it to our Linear Regression Model. 
+
+#### Sensitivity and Specificity
+
+We compared the models' Sensitivity and Specificity.  The LDA model is more sensitive (47.36% vs 34.3%) but less specific (69.74% va 84.03% ) than Logistic model.  Which means the Logistic model is more adept at recognizing missed shots, whereas the LDA model is more adept at identifying made shots.
+ 
+![](./images/logisticfreq.png)
+
+![](./images/ldafreq.png)
+ 
+#### Loss Function
+
+We compared the model's loss function's against the . We found out LDA model has a lower log loss, `.20022` than the Logistic model,`.21342`.  
+
+| Model    | Loss     |
+|----------|----------|
+| Logistic | 0.20022 |
+| LDA      | 0.21342 |
+
+
+## Conclusions
+
+Our analysis concludes that it is difficult to build a model from Kobe's shot statistics that can reasonably predict whether or not a shot went in.  We showed a logistic regression model was about 34% accurate on our test data with a probability level set at `.5` and a LDA model that was 47% accurate at `.5` probability level.    
+
+We speculate that additional data points commonly captured in sport statistics such as whether or not the shot was contested could add specificity to the model.  We also do not rule out the need to explore more models based upon the data available in our datset.
+
+
+ 
