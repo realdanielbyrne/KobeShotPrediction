@@ -36,6 +36,7 @@ kobe$playoffs = factor(kobe$playoffs)
 kobe$period = factor(kobe$period)
 kobe$season = factor(kobe$season)
 kobe$playoffs = factor(kobe$playoffs)
+kobe$shot_made_flag = factor(kobe$shot_made_flag)
 kobe$time_remaining = 60*kobe$minutes_remaining+kobe$seconds_remaining
 ```
 
@@ -63,38 +64,22 @@ This type of model could be used in building a simulation or video game mimickin
 
 ## Data Description
 
-The field names are self explanatory and contain the following attributes:
+The field names are self explanatory.  The predictors our analysis focused on are as follows:
 
 | Data Label         | Description                                         |
 |--------------------|-----------------------------------------------------|
-| action_type        | Type of shot action                                 |
 | combined_shot_type | Type of shot combined with action                   |
-| game_event_id      | Game id used to identify shots within the same game |
-| game_id            | Game id used to identify shots within the same game |
-| lat                | Horizontal position on floor                        |
-| loc_x              | Horizontal position on floor                        |
 | loc_y              | Vertical position on floor                          |
-| lon                | Vertical position on floor                          |
 | minutes_remaining  | Minutes remaining in quarter                        |
-| period             | Quarter of play                                     |
 | playoffs           | Playoff game or not                                 |
-| season             | Season label                                        |
 | seconds_remaining  | Seconds remaining in quarter                        |
 | shot_distance      | Distance from goal                                  |
 | shot_made_flag     | 1- shot went I, 0 - shot missed                     |
 | shot_type          | 2pt or 3pt shot                                     |
-| shot_zone_area     | General location of shot                            |
-| shot_zone_basic    | General location of shot                            |
-| shot_zone_range    | General range from basket                           |
-| team_id            | ID for LA Lakers                                    |
-| team_name          | Always LA Lakers                                    |
-| game_date          | The date the game was played on                     |
-| matchup            | The team and who was home vs away                   |
-| opponent           | The opposing team                                   |
-| shot_id            | Unique shot ID                                      |
 | attendance         | The attendance in the stadium                       |
 | arena_temp         | The average temperature during the game             |
 | avgnoisedb         | The average noise level in dB during the game       |
+
 
 ## Data Analysis
 
@@ -108,8 +93,6 @@ We evaluated a large but not exhaustive number of predictive variable combinatio
 
 
 ```{r}
-
-
 par(mfrow=c(2,2))
 
 plot(kobe$shot_made_flag,col=rainbow(2),xlab="Missed(0) Made(1)")
@@ -159,8 +142,49 @@ assoc(tbl,shade=TRUE,legend = TRUE)
 
 
 
+## Analysis Questions
 
+We set out to test the following hyphothesis:
 
+1. The odds of Kobe making a shot decrease with respect to the distance he is from the hoop.
+2. The probability of Kobe making a shot decreases linearly with respect to the distance he is from the hoop.    
+3. The relationship between the distance Kobe is from the basket and the odds of him making the shot is different if they are in the playoffs.
+
+To test these hyphothesis we evaluated several models.  For the first we evelated a logisic regression model consisting of shot_distance, shot_type, combined_shot_type and a linear combination of the continuous variables time_remaining, attendance, arena_temp, avgnoisedb using principal componenet analysis. Principal component analysis is a statistical techinique that transforms a set of possibly correlated variables into a set of values of linearly uncorrelated variables.
+
+Our PCA analysis revealed that the first orthoganol combination contributed nealy 95% of the variance of these variables where as the remaining transformations did not contribute signifigantly.
+
+```
+proc princomp cov prefix=k data=kobe out=kobe;
+var time_remaining attendance arena_temp avgnoisedb;
+run;
+```
+
+```{r}
+pcamodel = kobe %>% select(time_remaining,attendance,arena_temp,avgnoisedb)
+pca <- prcomp(pcamodel) 
+plot(pca, type = "l")
+print(pca)
+```
+
+In final SAS model was then we only included k1, the first orthagonal combination of PCA analysis.
+
+```
+  class shot_type home combined_shot_type(ref='Jump Shot') /param=ref;
+  model shot_made_flag(event='1') = shot_distance shot_type k1 combined_shot_type
+```
+
+```{r}
+log1 = glm(shot_made_flag ~ shot_distance + combined_shot_type + shot_type , data=kobe,family="binomial")
+```
+
+From the results in the table above, shot_distance, combined_shot_type, shot_type, and k1 all appear to be statistically signifigant with p-values << 0.
+
+```{r}
+t = wald.test(b = coef(log1), Sigma = vcov(log1), Terms = 2:6)
+```
+
+Furthermore the chi-squared test statistic of 914.9, with 5 degree of freedom and a p-value << 0 indicates that the overall effect of combined_shot_type is statistically significant as well.
 
 
 
