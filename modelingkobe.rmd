@@ -6,6 +6,7 @@ output:
   word_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 
@@ -31,10 +32,10 @@ kobe$shot_zone_basic = factor(kobe$shot_zone_basic)
 kobe$shot_zone_range = factor(kobe$shot_zone_range)
 kobe$season = factor(kobe$season)
 kobe$playoffs = factor(kobe$playoffs)
-kobe$shot_made_flag = factor(kobe$shot_made_flag)
 kobe$period = factor(kobe$period)
 kobe$season = factor(kobe$season)
 kobe$playoffs = factor(kobe$playoffs)
+kobe$time_remaining = 60*kobe$minutes_remaining+kobe$seconds_remaining
 ```
 
 ## Abstract
@@ -93,4 +94,35 @@ The field names are self explanatory and contain the following attributes:
 | attendance         | The attendance in the stadium                       |
 | arena_temp         | The average temperature during the game             |
 | avgnoisedb         | The average noise level in dB during the game       |
+
+We evaluated a large but not exhaustive number of predictive variable combinations and potential models in our analysis.  The following variables played a part in our final model
+
+#### Categorical Variables Used in Model
+
+The output of our model.
+
+```{r}
+
+
+layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
+plot(kobe$shot_made_flag)
+plot(kobe$shot_type,col=rainbow(2), xlab="Shot Type")
+plot(kobe$combined_shot_type,col=rainbow(5), xlab="Combined Shot Type") 
+```
+
+
+
+#### Continuours Variables
+
+We combined the following continuous variables into their principle components to include in out final model.
+
+```{r}
+#time_remaining attendance arena_temp avgnoisedb
+par(mfrow=c(1,3))
+boxplot(kobe$attendance, xlab="Attendance",col=kobe$attendance)
+boxplot(kobe$arena_temp, xlab="Arena Temperature",col=kobe$arena_temp)
+boxplot(kobe$time_remaining,xlab="Time Remaining(s)",col=kobe$time_remaining)
+```
+
+
 
