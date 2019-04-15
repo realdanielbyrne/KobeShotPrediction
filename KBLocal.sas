@@ -137,13 +137,14 @@ run;
 
 
 /* shot_type Analysis - •	The odds of Kobe making a shot decrease with respect to the distance he is from the hoop */
-proc logistic data = kobe plots = all;
-  class shot_type home combined_shot_type(ref='Jump Shot') /param=ref;
+proc logistic data = kobetrain plots = all;
+  class shot_type combined_shot_type(ref='Jump Shot') /param=ref;
   model shot_made_flag(event='1') = shot_distance shot_type k1 combined_shot_type
-                                   / ctable lackfit clparm=wald cl pcorr pprob=.4 .5 .6;    
+                                   / ctable lackfit clparm=wald cl pcorr ;    
 	contrast 'shot_distance vs. shot_type' shot_distance 1 -1 0 0 0 0 ;
   output out=logisticOut predprobs=I p=predprob resdev=resdev reschi=pearres;
 run;
+
 
 title "Examine Senisitivity and Speicificity for Logistic";
 proc freq data=logisticOut; tables shot_made_flag*_into_/nocol nopercent; run;
